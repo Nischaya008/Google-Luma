@@ -291,9 +291,31 @@ npm run dev
 
 ```text
 GoogleLuma/
+├── assets/
 ├── backend/
+│   ├── api/
+│   ├── cache/
+│   ├── core/
+│   ├── data/
+│   ├── db/
+│   ├── models/
+│   ├── scripts/
+│   ├── services/
+│   ├── utils/
+│   ├── main.py
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── render.yaml
 ├── frontend/
-├── docs/
+│   ├── src/
+│   ├── public/
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   ├── vercel.json
+│   └── eslint.config.js
+└── README.md
 ```
 
 ---
