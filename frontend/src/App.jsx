@@ -7,6 +7,7 @@ import HeatmapLayer from './components/HeatmapLayer';
 import RecentRoutesPanel from './components/RecentRoutesPanel';
 import TravelModeIsland from './components/TravelModeIsland';
 import LiveSafetyView from './components/LiveSafetyView';
+import ToastNotification from './components/ToastNotification';
 import { initSystemLocation } from './services/api';
 import { normalizeLatLonPair } from './utils/geo';
 import {
@@ -676,6 +677,9 @@ export default function App() {
           <div style={{ flex: 1 }} />
         </div>
       )}
+
+      {/* ── Toast Notifications ── */}
+      <ToastNotification />
     </div>
   );
 }
