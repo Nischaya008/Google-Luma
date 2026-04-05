@@ -66,24 +66,32 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Cache initialization failed (will operate without cache): {e}")
 
-    # Pre-load safety scoring data in background (KDE + VIIRS)
-    # This makes the first /routes/compare call faster
-    try:
-        from services.route_scorer import RouteSafetyScorer
-        scorer = RouteSafetyScorer.get_instance()
-        asyncio.create_task(_preload_safety_data(scorer))
-        logger.info("Safety data pre-loading launched (background).")
-    except Exception as e:
-        logger.warning(f"Safety data pre-load failed: {e}")
+    async def _sequential_preload():
+        import gc
+        try:
+            from services.route_scorer import RouteSafetyScorer
+            scorer = RouteSafetyScorer.get_instance()
+            await _preload_safety_data(scorer)
+            logger.info("Safety data pre-loading complete.")
+        except Exception as e:
+            logger.warning(f"Safety data pre-load failed: {e}")
 
-    # Pre-load CV model (DETR from HuggingFace) in background
-    try:
-        from services.cv_analyzer import CVSafetyAnalyzer
-        cv = CVSafetyAnalyzer.get_instance()
-        asyncio.create_task(_preload_cv_model(cv))
-        logger.info("CV model pre-loading launched (background).")
-    except Exception as e:
-        logger.warning(f"CV model pre-load skipped: {e}")
+        # Aggressively collect garbage from KDE/Pandas DataFrame loading
+        gc.collect()
+
+        try:
+            from services.cv_analyzer import CVSafetyAnalyzer
+            cv = CVSafetyAnalyzer.get_instance()
+            await _preload_cv_model(cv)
+            logger.info("CV model pre-loading complete.")
+        except Exception as e:
+            logger.warning(f"CV model pre-load skipped: {e}")
+
+        gc.collect()
+
+    # Launch the sequential preload background task
+    asyncio.create_task(_sequential_preload())
+    logger.info("Sequential data & model pre-loading launched (background).")
 
     logger.info("═══ Google Luma Ready ═══")
 
