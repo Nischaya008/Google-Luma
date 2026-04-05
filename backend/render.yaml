@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: google-luma-backend
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free # Free tier by default
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: ENVIRONMENT
+        value: "production"
+      # IMPORTANT: Populate these in the Render dashboard!
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DATABASE_PASS
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: REDIS_TOKEN
+        sync: false
+      # For GEE Key: 
+      # 1. Add your gee_key.json as a "Secret File" in Render.
+      # 2. Set GEE_SERVICE_ACCOUNT_KEY environment var to the path (e.g. /etc/secrets/gee_key.json).
+      - key: GEE_SERVICE_ACCOUNT_KEY
+        sync: false

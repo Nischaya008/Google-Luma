@@ -324,7 +324,9 @@ class POILoader:
                 logger.warning("No POIs found in bounding box.")
                 return []
 
-            centroids = pois.geometry.centroid
+            # Project to a Cartesian CRS (meters) before calculating centroids
+            # to avoid geographic CRS warnings and improve accuracy.
+            centroids = pois.to_crs(epsg=3857).geometry.centroid.to_crs(epsg=4326)
             result = list(zip(centroids.y, centroids.x))
             logger.info(f"Extracted {len(result)} real POIs from OSM.")
             return result

@@ -361,7 +361,10 @@ class SafetyFeatureEngineer:
         num_edges = len(gdf_edges)
 
         # Compute geographic midpoints for spatial queries
-        centroids = gdf_edges.geometry.centroid
+        # Compute geographic midpoints for spatial queries using a 
+        # Cartesian CRS projection to avoid geographic CRS warnings.
+        # This improves accuracy by computing centroids in meters.
+        centroids = gdf_edges.to_crs(epsg=3857).geometry.centroid.to_crs(epsg=4326)
         midpoints = np.column_stack((centroids.y, centroids.x))
 
         logger.info(f"Processing {num_edges} road segments...")

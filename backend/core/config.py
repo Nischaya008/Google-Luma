@@ -2,6 +2,7 @@
 Application configuration management utilizing pydantic-settings.
 All paths, API keys, and tunable parameters are centralized here.
 """
+
 from pydantic_settings import BaseSettings
 from typing import Dict, List
 
@@ -172,6 +173,35 @@ class Settings(BaseSettings):
 
     # Temporal safety adjustment (multiplicative, see safety_context.apply_temporal_safety_adjustment)
     SAFETY_TEMPORAL_MAX_DRAG: float = 0.12
+
+    # ── Computer Vision Module (ONNX Runtime) ─────────────────────────────
+    # How much the pre-computed ML route score vs live CV score
+    # contributes to the final blended safety score during live camera mode.
+    ML_BLEND_WEIGHT: float = 0.7
+    CV_BLEND_WEIGHT: float = 0.3
+
+    # CV safety score component weights (must sum to 1.0)
+    CV_BRIGHTNESS_WEIGHT: float = 0.50
+    CV_CROWD_WEIGHT: float = 0.20
+    CV_VEHICLE_WEIGHT: float = 0.15
+    CV_STRUCTURE_WEIGHT: float = 0.15
+
+    # YOLOS-Tiny detection confidence threshold (lower = more detections, noisier)
+    CV_DETECTION_CONFIDENCE: float = 0.75
+
+    # Max image dimension for CV inference (resize to this for speed)
+    # 512 balances detection quality with Render free tier memory limits
+    CV_FRAME_MAX_SIZE: int = 512
+
+    # Normalization divisors — maps raw counts to [0, 1]
+    CV_CROWD_NORM_DIVISOR: float = 10.0     # 10+ people = max crowd score
+    CV_VEHICLE_NORM_DIVISOR: float = 8.0    # 8+ vehicles = max vehicle score
+    CV_INFRA_NORM_DIVISOR: float = 5.0      # 5+ infrastructure items = max
+
+    # Isolation Forest anomaly detection parameters
+    CV_ANOMALY_CONTAMINATION: float = 0.05  # 5% of frames flagged as anomalous
+    CV_ANOMALY_WINDOW_SIZE: int = 50        # Rolling window of frames
+    CV_ANOMALY_MIN_FRAMES: int = 10         # Min frames before detection activates
 
     class Config:
         env_file = ".env"

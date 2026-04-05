@@ -11,8 +11,16 @@ Startup lifecycle:
   2. Pre-load safety data (KDE + VIIRS) in background
   3. Start serving requests immediately
 """
+
+
 import asyncio
 import logging
+
+try:
+    import onnxruntime
+except ImportError:
+    pass
+
 from contextlib import asynccontextmanager
 
 logging.basicConfig(
@@ -29,7 +37,7 @@ logging.getLogger("hpack").setLevel(logging.WARNING)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import health, routing
+from api.routes import health, routing, cv
 from core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -68,6 +76,15 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Safety data pre-load failed: {e}")
 
+    # Pre-load CV model (DETR from HuggingFace) in background
+    try:
+        from services.cv_analyzer import CVSafetyAnalyzer
+        cv = CVSafetyAnalyzer.get_instance()
+        asyncio.create_task(_preload_cv_model(cv))
+        logger.info("CV model pre-loading launched (background).")
+    except Exception as e:
+        logger.warning(f"CV model pre-load skipped: {e}")
+
     logger.info("═══ Google Luma Ready ═══")
 
     yield  # Server is running
@@ -84,6 +101,15 @@ async def _preload_safety_data(scorer):
         logger.info("Safety data pre-loaded ✓ (KDE + VIIRS ready)")
     except Exception as e:
         logger.warning(f"Safety data pre-load error: {e}")
+
+
+async def _preload_cv_model(cv_analyzer):
+    """Pre-load ONNX YOLOS-Tiny model from HuggingFace in a background thread."""
+    try:
+        await asyncio.to_thread(cv_analyzer.ensure_loaded)
+        logger.info("CV model pre-loaded ✓ (ONNX YOLOS-Tiny ready)")
+    except Exception as e:
+        logger.warning(f"CV model pre-load error: {e}")
 
 
 def create_app() -> FastAPI:
@@ -107,6 +133,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(health.router, prefix="/api/v1/health", tags=["Health"])
     app.include_router(routing.router, prefix="/api/v1/routing", tags=["Routing"])
+    app.include_router(cv.router, prefix="/api/v1/routing", tags=["Computer Vision"])
 
     return app
 
