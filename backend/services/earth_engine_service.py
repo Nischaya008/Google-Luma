@@ -38,11 +38,34 @@ def _init_gee() -> bool:
         logger.info("GEE credentials not configured. Vegetation isolation scoring disabled.")
         return False
 
+    import os
+    key_path = settings.GEE_SERVICE_ACCOUNT_KEY
+
+    # Fix Windows-style relative paths in env vars when running on Linux (Render)
+    if key_path.startswith('.\\'):
+        key_path = key_path.replace('.\\', './')
+
+    # Render mounts secret files at /etc/secrets/ by default
+    render_secret_path = "/etc/secrets/gee_key.json"
+
+    # Fallback resolution sequence
+    if not os.path.exists(key_path):
+        if os.path.exists(render_secret_path):
+            key_path = render_secret_path
+        elif os.path.exists("./gee_key.json"):
+            key_path = "./gee_key.json"
+        elif os.path.exists("../gee_key.json"):
+            key_path = "../gee_key.json"
+
+    if not os.path.exists(key_path):
+        logger.warning(f"GEE key file not found. Checked {settings.GEE_SERVICE_ACCOUNT_KEY} and fallbacks. Vegetation scoring disabled.")
+        return False
+
     try:
         import ee
         credentials = ee.ServiceAccountCredentials(
             email=None,  # Will be read from the key file
-            key_file=settings.GEE_SERVICE_ACCOUNT_KEY,
+            key_file=key_path,
         )
         ee.Initialize(credentials=credentials, project=settings.GEE_PROJECT_ID)
         _ee = ee
