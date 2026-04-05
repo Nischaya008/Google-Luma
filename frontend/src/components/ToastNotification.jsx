@@ -8,15 +8,15 @@ export default function ToastNotification() {
     // Check if device is probably a desktop based on window width or touch points
     const checkIsDesktop = () => window.innerWidth > 768;
     setIsDesktop(checkIsDesktop());
-    
+
     const handleResize = () => setIsDesktop(checkIsDesktop());
     window.addEventListener('resize', handleResize);
 
     // Show toast after a slight delay so it catches attention
     const timer = setTimeout(() => {
       setShow(true);
-      // Auto-hide after 15 seconds
-      setTimeout(() => setShow(false), 15000);
+      // Auto-hide after 10 seconds
+      setTimeout(() => setShow(false), 10000);
     }, 2500);
 
     return () => {
@@ -53,7 +53,7 @@ export default function ToastNotification() {
           100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
         }
       `}</style>
-      
+
       {/* Route tip (All devices) */}
       <div style={{
         background: '#FEFCF8',
@@ -85,7 +85,7 @@ export default function ToastNotification() {
             Place pins or search different cities to see how the safety engine adapts to different scenarios.
           </p>
         </div>
-        <button 
+        <button
           onClick={() => setShow(false)}
           style={{
             background: 'transparent', border: 'none', padding: '4px', cursor: 'pointer',
@@ -94,8 +94,8 @@ export default function ToastNotification() {
           aria-label="Close"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-             <line x1="18" y1="6" x2="6" y2="18"></line>
-             <line x1="6" y1="6" x2="18" y2="18"></line>
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
       </div>
@@ -112,9 +112,9 @@ export default function ToastNotification() {
           alignItems: 'center',
           gap: '10px'
         }}>
-           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EAE4DC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-             <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-             <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EAE4DC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
           </svg>
           <p style={{ margin: 0, fontSize: '12px', color: '#EAE4DC', fontWeight: 500, lineHeight: 1.3 }}>
             <strong>Pro tip:</strong> Open this app on your mobile device to try the Live Safety Camera!
