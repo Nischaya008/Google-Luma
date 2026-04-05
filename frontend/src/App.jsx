@@ -70,8 +70,8 @@ export default function App() {
       setSecondsRemaining(left);
       setShowFallbackWarning(
         left > 0 &&
-          left * 1000 <= LOCATION_WARNING_REMAINING_MS &&
-          !gpsAcquiredRef.current
+        left * 1000 <= LOCATION_WARNING_REMAINING_MS &&
+        !gpsAcquiredRef.current
       );
       if (left === 0 && !gpsAcquiredRef.current) {
         setLocationSource('default');
@@ -197,7 +197,7 @@ export default function App() {
     }
     requestBrowserLocation(
       (ll) => {
-        initSystemLocation(ll[0], ll[1]).catch(() => {});
+        initSystemLocation(ll[0], ll[1]).catch(() => { });
         mapControllerRef.current?.flyToUser?.(ll, 15);
       },
       () =>
@@ -618,22 +618,41 @@ export default function App() {
             Luma waits up to <strong style={{ color: '#1A73E8', fontWeight: 600 }}>one minute</strong> for your location so the map can start near you.
             If permission is not granted in time, Luma opens the map at <strong style={{ color: '#1A73E8', fontWeight: 600 }}>{DEFAULT_MAP_LABEL}</strong>.
           </p>
-          <div style={{
-            marginBottom: 16,
-            padding: '12px 18px',
-            borderRadius: 14,
-            background: '#F0F4FA',
-            border: '1.5px solid #D7E3FC',
-            minWidth: 200,
-            textAlign: 'center',
-          }}>
-            <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#5F6368', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              Time remaining
-            </p>
-            <p style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 800, color: '#1A73E8', letterSpacing: '-0.5px', fontVariantNumeric: 'tabular-nums' }}>
-              {String(Math.floor(secondsRemaining / 60)).padStart(2, '0')}:{String(secondsRemaining % 60).padStart(2, '0')}
-            </p>
-          </div>
+          {locationSource === 'pending' ? (
+            <div style={{
+              marginBottom: 16,
+              padding: '12px 18px',
+              borderRadius: 14,
+              background: '#F0F4FA',
+              border: '1.5px solid #D7E3FC',
+              minWidth: 200,
+              textAlign: 'center',
+            }}>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#5F6368', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                Time remaining
+              </p>
+              <p style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 800, color: '#1A73E8', letterSpacing: '-0.5px', fontVariantNumeric: 'tabular-nums' }}>
+                {String(Math.floor(secondsRemaining / 60)).padStart(2, '0')}:{String(secondsRemaining % 60).padStart(2, '0')}
+              </p>
+            </div>
+          ) : (
+            <div style={{
+              marginBottom: 16,
+              padding: '12px 18px',
+              borderRadius: 14,
+              background: '#E8F0FE',
+              border: '1.5px solid #C5D8F9',
+              minWidth: 200,
+              textAlign: 'center',
+            }}>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#1A73E8', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                Location Acquired
+              </p>
+              <p style={{ margin: '6px 0 0', fontSize: 16, fontWeight: 700, color: '#1A73E8', letterSpacing: '-0.2px', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '34px' }}>
+                Building safe routes...
+              </p>
+            </div>
+          )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
             {[
