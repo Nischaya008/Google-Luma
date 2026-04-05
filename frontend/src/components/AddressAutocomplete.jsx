@@ -93,6 +93,11 @@ export default function AddressAutocomplete({
       if (typeof value === 'string') setQuery(value);
       else if (value?.label) setQuery(value.label);
       else if (Array.isArray(value)) setQuery(`${value[0].toFixed(4)}, ${value[1].toFixed(4)}`);
+      
+      // Prevents autocomplete search when value is set externally (e.g. Map pins)
+      justSelected.current = true;
+      setShowDropdown(false);
+      setLoading(false);
     } else {
       setQuery('');
       justSelected.current = false;
