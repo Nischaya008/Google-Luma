@@ -4,6 +4,7 @@ import MapView from './components/MapView';
 import Sidebar from './components/Sidebar';
 import RoutePanel from './components/RoutePanel';
 import HeatmapLayer from './components/HeatmapLayer';
+import HeatmapLoadingModal from './components/HeatmapLoadingModal';
 import RecentRoutesPanel from './components/RecentRoutesPanel';
 import TravelModeIsland from './components/TravelModeIsland';
 import LiveSafetyView from './components/LiveSafetyView';
@@ -696,6 +697,9 @@ export default function App() {
           <div style={{ flex: 1 }} />
         </div>
       )}
+
+      {/* ── Heatmap Loading Modal ── */}
+      <HeatmapLoadingModal loading={heatmapLoading} />
 
       {/* ── Toast Notifications ── */}
       <ToastNotification />
