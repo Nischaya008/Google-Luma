@@ -162,11 +162,14 @@ class ONNXDetector:
         if not prefer_quantized:
             variants.reverse()
 
+        hf_token = os.getenv("HF_TOKEN")
+
         for filename in variants:
             try:
                 path = hf_hub_download(
                     repo_id=self.HF_REPO_ID,
                     filename=filename,
+                    token=hf_token
                 )
                 logger.info(f"Model ready: {self.HF_REPO_ID}/{filename} → {path}")
                 return path
