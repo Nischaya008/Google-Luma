@@ -6,6 +6,7 @@ import RoutePanel from './components/RoutePanel';
 import HeatmapLayer from './components/HeatmapLayer';
 import RecentRoutesPanel from './components/RecentRoutesPanel';
 import TravelModeIsland from './components/TravelModeIsland';
+import LiveSafetyView from './components/LiveSafetyView';
 import { initSystemLocation } from './services/api';
 import { normalizeLatLonPair } from './utils/geo';
 import {
@@ -50,6 +51,7 @@ export default function App() {
   const [placingMarker, setPlacingMarker] = useState('source');
   const [heatmapVisible, setHeatmapVisible] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [liveSafetyActive, setLiveSafetyActive] = useState(false);
   const [systemInitializing, setSystemInitializing] = useState(true);
   const [systemLocation, setSystemLocation] = useState(null);
   /** 'pending' | 'gps' | 'default' — whether the blue dot reflects a real GPS fix */
@@ -219,8 +221,19 @@ export default function App() {
   /** X button: clear routes but keep addresses so user can re-search */
   const handleBackToSearch = useCallback(() => {
     clearRoutes();
+    setLiveSafetyActive(false);
     setPlacingMarker(null); // addresses already set; don't reset marker mode
   }, [clearRoutes]);
+
+  /** Activate live camera safety mode (mobile only) */
+  const handleActivateLiveSafety = useCallback(() => {
+    setLiveSafetyActive(true);
+  }, []);
+
+  /** Deactivate live camera safety mode */
+  const handleDeactivateLiveSafety = useCallback(() => {
+    setLiveSafetyActive(false);
+  }, []);
 
   useEffect(() => {
     if (hasRoutes) {
@@ -551,11 +564,23 @@ export default function App() {
               loading={loading}
               onSelectRoute={setSelectedRoute}
               travelLabel={travelProfile === 'foot' ? 'Walk' : 'Drive'}
+              onActivateLiveSafety={handleActivateLiveSafety}
             />
           </div>
         </div>
       )}
 
+      {/* ── Live Safety Camera View (mobile only, overlays everything) ── */}
+      {liveSafetyActive && hasRoutes && (
+        <LiveSafetyView
+          route={routes.find(r => r.mode === selectedRoute) || routes[0]}
+          routeSafetyScore={
+            (routes.find(r => r.mode === selectedRoute) || routes[0])?.average_safety_score ?? null
+          }
+          userLocation={locationSource === 'gps' ? systemLocation : null}
+          onBack={handleDeactivateLiveSafety}
+        />
+      )}
 
       {/* ── Init overlay ── */}
       {systemInitializing && (

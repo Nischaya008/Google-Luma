@@ -109,3 +109,27 @@ export async function fetchExplanation(u, v, key = 0) {
   const params = new URLSearchParams({ u, v, key });
   return request(`/explain?${params.toString()}`);
 }
+
+/**
+ * POST /cv/analyze
+ * Sends a base64-encoded camera frame for real-time CV safety analysis.
+ * Returns cv_safety_score, blended score, detections, and AI explanation.
+ */
+export async function analyzeCameraFrame(frameBase64, routeSafetyScore = null) {
+  return request('/cv/analyze', {
+    method: 'POST',
+    body: JSON.stringify({
+      frame_base64: frameBase64,
+      route_safety_score: routeSafetyScore,
+    }),
+    timeout: 10000, // 10s max — generous for heavy DETR inference
+  });
+}
+
+/**
+ * POST /cv/reset
+ * Clears the anomaly detection history when starting a new session.
+ */
+export async function resetCVHistory() {
+  return request('/cv/reset', { method: 'POST' });
+}

@@ -231,3 +231,67 @@ body {
     transform: scale(0.92);
   }
 }
+
+/* ===== Live Safety Camera Feed ===== */
+
+/* Pulsing dot indicator next to live score */
+.live-safety-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: liveSafetyPulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes liveSafetyPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+}
+
+/* Anomaly alert red pulsing border */
+.live-safety-anomaly-alert {
+  animation: anomalyPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes anomalyPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(234, 67, 53, 0);
+  }
+}
+
+/* Scanning dot animation for "Analyzing frame..." indicator */
+.live-safety-scan-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1A73E8;
+  animation: scanDot 1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes scanDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.6);
+  }
+}
+
+/* Mini map PIP — override Leaflet defaults for non-interactive map */
+.live-safety-pip .leaflet-control-zoom,
+.live-safety-pip .leaflet-control-attribution {
+  display: none !important;
+}
+

@@ -43,6 +43,7 @@ const RoutePanel = memo(function RoutePanel({
   loading,
   onSelectRoute,
   travelLabel,
+  onActivateLiveSafety,
 }) {
   const route = useMemo(
     () => routes.find(r => r.mode === selectedRoute) || routes[0],
@@ -256,6 +257,51 @@ const RoutePanel = memo(function RoutePanel({
           </p>
         </div>
       </div>
+
+      {/* ── Live Safety Camera button — mobile only ── */}
+      {onActivateLiveSafety && (
+        <button
+          className="flex md:hidden"
+          id="btn-live-safety"
+          onClick={onActivateLiveSafety}
+          style={{
+            marginTop: 10,
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: 14,
+            border: '1.5px solid rgba(26,115,232,0.3)',
+            background: 'linear-gradient(135deg, #E8F0FE 0%, #F0F4FA 100%)',
+            color: '#1557B0',
+            fontSize: 13,
+            fontWeight: 700,
+            letterSpacing: '0.01em',
+            cursor: 'pointer',
+            transition: 'all 250ms',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 9,
+            boxShadow: '0 2px 10px rgba(26,115,232,0.12)',
+            flexShrink: 0,
+          }}
+          aria-label="Open live camera safety analysis"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+            <circle cx="12" cy="13" r="4" />
+          </svg>
+          <span>Live Safety Camera</span>
+          <span style={{
+            fontSize: 9,
+            fontWeight: 800,
+            background: '#1A73E8',
+            color: 'white',
+            padding: '2px 6px',
+            borderRadius: 99,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}>AI</span>
+        </button>
+      )}
     </div>
   );
 });
