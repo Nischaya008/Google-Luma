@@ -167,8 +167,8 @@ class CacheManager:
         else:
             center_lat = round(lat1, 2)
             center_lon = round(lon1, 2)
-            # 5km covers the user's immediate area — fast single-tile download
-            radius_km = 5
+            # 2km covers the user's immediate area while preventing OOM on 512MB RAM
+            radius_km = 2
 
         return center_lat, center_lon, radius_km
 
