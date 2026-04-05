@@ -170,6 +170,13 @@ class CrimeDataLoader:
                     "storage_path": storage_path,
                 }, on_conflict="data_hash").execute()
 
+        # Aggressively release dataframe memory locally now that KDE is built
+        self._incidents_df = None
+        self._district_rates = None
+        self._state_rates = None
+        import gc
+        gc.collect()
+
         return model
 
     # ── Dataset 2: District-Level Crime Rates ────────────────────────────────
