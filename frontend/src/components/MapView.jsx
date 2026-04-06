@@ -14,7 +14,7 @@ function MapApiBridge({ controllerRef, routes }) {
     controllerRef,
     () => ({
       getCenter() {
-        const c = map.getCenter();
+        const c = map.getCenter().wrap();
         return [c.lat, c.lng];
       },
       flyToUser(latlng, zoom = 15) {
@@ -102,7 +102,10 @@ function MapClickHandler({ onMapClick, isPlacing }) {
 
   useEffect(() => {
     if (!onMapClick) return;
-    const handler = (e) => onMapClick([e.latlng.lat, e.latlng.lng]);
+    const handler = (e) => {
+      const wrapped = e.latlng.wrap();
+      onMapClick([wrapped.lat, wrapped.lng]);
+    };
     map.on('click', handler);
     return () => map.off('click', handler);
   }, [map, onMapClick]);
