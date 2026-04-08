@@ -16,11 +16,6 @@ Startup lifecycle:
 import asyncio
 import logging
 
-try:
-    import onnxruntime
-except ImportError:
-    pass
-
 from contextlib import asynccontextmanager
 
 logging.basicConfig(
@@ -37,7 +32,6 @@ logging.getLogger("hpack").setLevel(logging.WARNING)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import health, routing, cv
 from core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -130,19 +124,21 @@ def create_app() -> FastAPI:
     )
 
     # Configure CORS for frontend access
+    # allow_origins=["*"] + allow_credentials=False is valid per CORS spec.
+    # (The previous config had allow_credentials=True + wildcard, which is INVALID
+    #  and causes browsers to reject responses silently.)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "https://googleluma.vercel.app",
-            "http://localhost:5173",
-            "http://localhost:3000",
-        ],
+        allow_origins=["*"],
         allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
-    # Include routers
+    # Include routers — imported here (not top-level) so that uvicorn
+    # binds the port BEFORE heavy numpy/sklearn/PIL/onnx imports execute.
+    # This prevents Render's port-scan timeout from cancelling deploys.
+    from api.routes import health, routing, cv
     app.include_router(health.router, prefix="/api/v1/health", tags=["Health"])
     app.include_router(routing.router, prefix="/api/v1/routing", tags=["Routing"])
     app.include_router(cv.router, prefix="/api/v1/routing", tags=["Computer Vision"])
