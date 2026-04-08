@@ -132,8 +132,12 @@ def create_app() -> FastAPI:
     # Configure CORS for frontend access
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
+        allow_origins=[
+            "https://googleluma.vercel.app",
+            "http://localhost:5173",
+            "http://localhost:3000",
+        ],
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
