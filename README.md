@@ -1,6 +1,6 @@
 # Google Luma: Fear-Free Night Navigator
 ---
-> **Note:- I am severly limited due to free tier limitations on render and hence, the backend spin out of activity and sleeps ; inducing cold starts despite cron-job pings due to resources limitation (0.1CPU and 512MB RAM).**
+> **Note:- The backend is robustly deployed on Hugging Face Spaces Free Tier (16GB RAM, 2 vCPU), completely eliminating the aggressive sleep-state cold starts and concurrency limits previously experienced on Render.**
 ---
 An AI-powered navigation system that prioritizes psychological safety over Estimated Time of Arrival (ETA).
 
@@ -306,8 +306,7 @@ GoogleLuma/
 │   ├── utils/
 │   ├── main.py
 │   ├── Dockerfile
-│   ├── requirements.txt
-│   └── render.yaml
+│   └── requirements.txt
 ├── frontend/
 │   ├── src/
 │   ├── public/
