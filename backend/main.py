@@ -30,11 +30,42 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("hpack").setLevel(logging.WARNING)
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 from core.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+# ── Bomb-proof CORS Middleware ───────────────────────────────────────────
+# Replaces Starlette's CORSMiddleware which silently breaks with certain
+# allow_origins / allow_credentials combos across Starlette versions.
+# This unconditionally injects CORS headers on EVERY response.
+
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept, Origin",
+    "Access-Control-Max-Age": "86400",
+}
+
+
+class RawCORSMiddleware(BaseHTTPMiddleware):
+    """Unconditionally inject CORS headers on every response, including errors."""
+
+    async def dispatch(self, request: Request, call_next):
+        # Handle preflight OPTIONS immediately — no need to hit the app
+        if request.method == "OPTIONS":
+            return Response(status_code=204, headers=CORS_HEADERS)
+
+        # Normal request — forward to app, then inject headers
+        response = await call_next(request)
+        for key, value in CORS_HEADERS.items():
+            response.headers[key] = value
+        return response
 
 
 @asynccontextmanager
@@ -123,17 +154,15 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # Configure CORS for frontend access
-    # allow_origins=["*"] + allow_credentials=False is valid per CORS spec.
-    # (The previous config had allow_credentials=True + wildcard, which is INVALID
-    #  and causes browsers to reject responses silently.)
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    # Bomb-proof CORS — injects headers on every response including errors.
+    # Replaces Starlette CORSMiddleware which silently breaks with certain
+    # allow_credentials + wildcard combinations across versions.
+    app.add_middleware(RawCORSMiddleware)
+
+    # Root endpoint — prevents 404 on Render's initial HEAD / port probe
+    @app.get("/")
+    async def root():
+        return {"status": "ok", "service": "Google Luma"}
 
     # Include routers — imported here (not top-level) so that uvicorn
     # binds the port BEFORE heavy numpy/sklearn/PIL/onnx imports execute.
@@ -151,3 +180,4 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
