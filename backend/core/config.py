@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     PRE_WARM_CITIES: str = "Bangalore,Delhi,Mumbai,Chennai,Kolkata,Chandigarh,Kochi,Lucknow"
 
     # ── Memory Management ───────────────────────────────────────────────────
-    MAX_CACHED_GRAPHS: int = 2          # LRU eviction threshold for in-memory graphs
+    MAX_CACHED_GRAPHS: int = 20         # Increased to 20 for HuggingFace 16GB capacity
 
     # Pre-warming radius (km) — covers most intra-city routes
     PRE_WARM_RADIUS_KM: int = 15
